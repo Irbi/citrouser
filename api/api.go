@@ -10,8 +10,11 @@ type IRoutingApi interface {
 }
 
 type api struct {
+	Health		*healthApi
+	Auth 		*apiAuth
 	Users 		*userApi
 	UserProfile *profileApi
+	Portfolio 	*portfolioApi
 }
 
 func New(r *gin.Engine) (router *api) {
@@ -21,8 +24,12 @@ func New(r *gin.Engine) (router *api) {
 }
 
 func (a *api) routes(r *gin.RouterGroup) {
+
+	a.Health.Routes(r.Group("health"))
+	a.Auth.Routes(r.Group("auth"))
 	a.Users.Routes(r.Group("users"))
 	a.UserProfile.Routes(r.Group("profile"))
+	a.Portfolio.Routes(r.Group("portfolio"))
 }
 
 func HandleError(ctx *gin.Context, err error, code int) bool {

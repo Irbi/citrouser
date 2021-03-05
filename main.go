@@ -29,16 +29,6 @@ func (a *App) Initialize() {
 	initRouter(a)
 }
 
-func (a *App) Run() {
-	log.Info("Run API...")
-
-	err := a.Router.Run(":" + os.Getenv("PORT"))
-
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func initLogger() {
 	log.SetLevel(log.DebugLevel)
 
@@ -52,18 +42,31 @@ func initLogger() {
 
 func initDb(a *App) {
 	log.Info("Init DB...")
-	connString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_NAME"),
-		os.Getenv("DB_PASSWORD"),
-	)
 
-	a.DB = db.Init(connString)
+	a.DB = db.Init(os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"))
+
+	log.Info("DB connected")
 }
 
 func initRouter(a *App) {
+	log.Info("Init API Routing...")
 	a.Router = gin.Default()
 	api.New(a.Router)
+	log.Info("Routing is running")
+}
+
+func (a *App) Run() {
+	log.Info("Run Server...")
+
+	err := a.Router.Run(":" + os.Getenv("PORT"))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Info("Server is running")
 }

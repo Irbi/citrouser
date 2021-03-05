@@ -33,6 +33,9 @@ type Permission struct {
 	EditPortfolioDraft			bool	`json:"editPortfolioDraft" gorm:"default:false;"`
 	DeletePortfolioDraft		bool	`json:"deletePortfolioDraft" gorm:"default:false;"`
 
+	CreateReport				bool	`json:"createReport" gorm:"default:false;"`
+	DeleteReport				bool	`json:"deleteReport" gorm:"default:false;"`
+
 	ManageAssets				bool	`json:"manageAssets" gorm:"default:false;"`
 }
 
@@ -73,6 +76,9 @@ type PermissionPreset struct {
 	CreatePortfolioDraft		uint	`json:"createPortfolioDraft" gorm:"default:0;"`
 	EditPortfolioDraft			uint	`json:"editPortfolioDraft" gorm:"default:0;"`
 	DeletePortfolioDraft		uint	`json:"deletePortfolioDraft" gorm:"default:0;"`
+
+	CreateReport				uint	`json:"createReport" gorm:"default:0;"`
+	DeleteReport				uint	`json:"deleteReport" gorm:"default:0;"`
 
 	ManageAssets				uint	`json:"manageAssets" gorm:"default:0;"`
 }

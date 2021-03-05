@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/Irbi/citrouser/constants"
 	"github.com/Irbi/citrouser/db"
+	"github.com/Irbi/citrouser/requests"
 	"github.com/Irbi/citrouser/requests/userRequests"
 	"github.com/Irbi/citrouser/responses"
 	"github.com/Irbi/citrouser/responses/userResponses"
@@ -11,6 +12,7 @@ import (
 	"github.com/Irbi/citrouser/validators"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
 
 type userApi struct {}
@@ -19,7 +21,8 @@ func (a *userApi) Routes(r gin.IRoutes) {
 	r.POST("", a.create)
 	r.GET("", a.getAll)
 	r.GET("/:id", a.get)
-	r.POST("/:id", a.update)
+	r.GET("/:id/portfolios", a.getPortfoliosByClient)
+	r.PUT("/:id", a.update)
 }
 
 func (a *userApi) get(ctx *gin.Context) {
@@ -35,15 +38,39 @@ func (a *userApi) get(ctx *gin.Context) {
 		return
 	}
 
+	user.Password = ""
+
 	ctx.JSON(http.StatusOK, user)
 }
 
-func (a *userApi) getAll(ctx *gin.Context) {}
+func (a *userApi) getAll(ctx *gin.Context) {
+	req := &requests.DefaultSearchRequest{}
+	err := ctx.Bind(req)
+	if err != nil {
+		HandleError(ctx, err, http.StatusBadRequest)
+		return
+	}
+
+	usersList, totalCount, err := db.UserModel(nil).Find(req.Offset, req.Limit, req.Sort, req.Order, "")
+	if err != nil {
+		HandleError(ctx, err, http.StatusInternalServerError)
+		return
+	}
+
+	for i := 0; i < len(usersList); i++ {
+		usersList[i].Password = ""
+	}
+
+	ctx.JSON(http.StatusOK, userResponses.UsersListResponse{
+		Users: usersList,
+		TotalCount: uint(totalCount),
+	})
+}
 
 func (a *userApi) create(ctx *gin.Context) {
 	actorID := uint(1)
-	req := &userRequests.UserCreateRequest{}
 
+	req := &userRequests.UserCreateRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		HandleError(ctx, err, http.StatusBadRequest)
@@ -58,6 +85,7 @@ func (a *userApi) create(ctx *gin.Context) {
 	}
 
 	req.User.Profile = &req.Profile
+	req.User.Profile.PasswordLastUpdate = time.Now()
 	req.User.Status = constants.USER_STATUS_ACTIVE
 	req.User.Password, err = tools.HashPassword(req.User.Password)
 	if err != nil {
@@ -104,13 +132,23 @@ func (a *userApi) update(ctx *gin.Context) {
 		return
 	}
 
+	req.User.Profile = &req.Profile
 	req.User.Profile.ID = userExisted.ProfileID
 
-	err = db.UserModel(nil).Update(actorID, &req.User)
+	err = db.UserModel(nil).UpdateExcept(actorID, &req.User, "password")
 	if err != nil {
 		HandleError(ctx, err, http.StatusInternalServerError)
 		return
 	}
 
+	err = db.ProfileModel(nil).Update(actorID, req.User.Profile)
+	if err != nil {
+		HandleError(ctx, err, http.StatusInternalServerError)
+		return
+	}
+
+
 	ctx.JSON(http.StatusOK, responses.SuccessResponse{Success: true})
 }
+
+func (a *userApi) getPortfoliosByClient(ctx *gin.Context) {}
