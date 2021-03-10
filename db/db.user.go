@@ -2,7 +2,6 @@ package db
 
 import (
 	"github.com/Irbi/citrouser/model"
-	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"strconv"
 )
@@ -10,14 +9,12 @@ import (
 var defaultSort = "created_at"
 var defaultOrder = "ASC"
 
+
 type userModel struct {
 	db *gorm.DB
 }
 
 func UserModel(tx *gorm.DB) *userModel {
-
-	log.Debugf("Connection: %v", Connection)
-
 	if tx == nil {
 		tx = Connection
 	}
@@ -46,11 +43,11 @@ func (m *userModel) UpdateExcept(actorID uint, user *model.User, omitFields... s
 	return
 }
 
-func (m *userModel) UpdateOnly(actorID uint, userID uint, updateFields... interface{}) (err error) {
+func (m *userModel) UpdateStatus(actorID uint, userID uint, status string) (err error) {
 	err = m.db.Model(&model.User{}).
 		Where("id = ?", userID).
 		Update("updated_by", actorID).
-		Updates(updateFields).Error
+		Update("status", status).Error
 
 	return
 }
@@ -113,6 +110,43 @@ func (m *userModel) Find(offset, limit, sortBy, sortOrder, role interface{}) (us
 
 	users = []model.User{}
 	err = v.Find(&users).Error
+
+	return
+}
+
+func (m *userModel) UpdatePassword(userID uint, password string) (err error) {
+	err = m.db.Model(&model.User{}).Where("id = ?", userID).Update("password", password).Error
+	return
+}
+
+
+func (m *portfolioModel) GetPortfoliosByClient(userID uint, offset, limit, sortBy, sortOrder interface{}) (portfolios []model.Portfolio, totalCount int64, err error) {
+	v := m.db.Model(&model.Portfolio{}).Count(&totalCount)
+
+	if sortBy == "" {
+		sortBy = defaultSort
+	}
+	if sortOrder == "" {
+		sortOrder = defaultOrder
+	}
+
+	intOffset, err := strconv.Atoi(offset.(string))
+	if err != nil {
+		return nil, 0, err
+	}
+
+	intLimit, err := strconv.Atoi(limit.(string))
+	if err != nil {
+		return nil, 0, err
+	}
+
+	v = v.Order(sortBy.(string) + " " + sortOrder.(string))
+	v = v.Offset(intOffset)
+	v = v.Limit(intLimit)
+	v = v.Where("client_id = ?", userID)
+
+	portfolios = []model.Portfolio{}
+	err = v.Find(&portfolios).Error
 
 	return
 }

@@ -6,5 +6,6 @@ type FinancialInstrument struct {
 	SystemName 			string  			`json:"sysName" gorm:"type:varchar(255);uniqueIndex;not null;"`
 	FinancialAssetID	uint 				`json:"-"`
 	FinancialAsset		*FinancialAsset 	`gorm:"foreignkey:FinancialAssetID;"`
+	ISIN 				string				`json:"isin" gorm:"varchar(255);uniqueIndex;not null;" binding:"required"`
 	Description			string				`json:"description" gorm:"type:varchar(255);"`
 }

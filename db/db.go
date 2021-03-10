@@ -48,9 +48,11 @@ func Connect(connString string, isMigrationNeeded bool) (connection *gorm.DB, er
 		err = connection.AutoMigrate(
 			&model.User{},
 			&model.Profile{},
+			&model.TempPassword{},
 			&model.FinancialAssetCategory{},
 			&model.FinancialAsset{},
 			&model.FinancialInstrument{},
+			&model.ClientAdvisor{},
 		)
 
 		if err != nil {

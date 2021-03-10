@@ -12,6 +12,7 @@ type Permission struct {
 
 	ViewAdvisorsList			bool 	`json:"viewAdvisorsList" gorm:"default:false;"`
 	CreateAdvisor				bool 	`json:"createAdvisor" gorm:"default:false;"`
+	ActivateAdvisor				bool 	`json:"activateAdvisor" gorm:"default:false;"`
 	EditAdvisor					bool 	`json:"editAdvisor" gorm:"default:false;"`
 	DeleteAdvisor				bool 	`json:"deleteAdvisor" gorm:"default:false;"`
 
@@ -56,6 +57,7 @@ type PermissionPreset struct {
 
 	ViewAdvisorsList			uint 	`json:"viewAdvisorsList" gorm:"default:0;"`
 	CreateAdvisor				uint 	`json:"createAdvisor" gorm:"default:0;"`
+	ActivateAdvisor				uint 	`json:"activateAdvisor" gorm:"default:0;"`
 	EditAdvisor					uint 	`json:"editAdvisor" gorm:"default:0;"`
 	DeleteAdvisor				uint 	`json:"deleteAdvisor" gorm:"default:0;"`
 

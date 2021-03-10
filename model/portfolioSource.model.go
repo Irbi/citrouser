@@ -1,5 +1,7 @@
 package model
 
 type PortfolioSource struct {
-	Source string `json:"source" gorm:"varchar(255);"`
+	BaseModel
+	PortfolioID		uint 		`json:"-"`
+	Portfolio		*Portfolio	`gorm:"foreignkey:PortfolioID;"`
 }

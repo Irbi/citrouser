@@ -1,0 +1,7 @@
+package constants
+
+const (
+	AUTH_TOKEN_EXRIPATION = 24
+	RESET_PASSWORD_LINK_EXPIRATION = 48
+
+)

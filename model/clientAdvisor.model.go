@@ -2,8 +2,8 @@ package model
 
 type ClientAdvisor struct {
 	BaseModel
-	ClientID	uint	`json:"-"`
-	Client		*User	`gorm:"foreignkey:UserID;"`
-	AdvisorID	uint	`json:"-"`
-	Advisor		*User	`gorm:"foreignkey:UserID;"`
+	ClientUserID	uint	`json:"-"`
+	ClientUser		*User	`gorm:"foreignkey:ClientUserID;"`
+	AdvisorUserID	uint	`json:"-"`
+	AdvisorUser		*User	`gorm:"foreignkey:AdvisorUserID;"`
 }

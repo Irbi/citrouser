@@ -15,6 +15,11 @@ type App struct {
 	DB     *gorm.DB
 }
 
+type Sample struct {
+	F1 int
+	F2 string
+}
+
 func main() {
 	fmt.Println("####################### YEP, IT WORKS #######################")
 
